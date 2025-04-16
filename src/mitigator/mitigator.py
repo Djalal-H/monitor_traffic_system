@@ -459,5 +459,5 @@ async def main():
     # Clean up at the end
     mitigator.reset_mitigations()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+""" if __name__ == "__main__":
+    asyncio.run(main()) """
