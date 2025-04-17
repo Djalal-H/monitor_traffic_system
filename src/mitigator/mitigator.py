@@ -4,7 +4,6 @@ import logging
 import subprocess
 import os
 import shutil
-
 # Configure logging for actions
 logging.basicConfig(filename="mitigation.log", level=logging.INFO)
 
@@ -106,17 +105,18 @@ class Mitigator:
     def __init__(self):
         """Initialize the Mitigator class."""
         self.action_map = {
-            "rogue_ap": self._handle_rogue_ap,
-            "deauth": self._handle_deauth,
-            "botnet_ddos": self._handle_botnet_ddos,
-            "sql_injection": self._handle_sql_injection,
-            "reassociation": self._handle_reassociation
+            "Rogue_AP": self._handle_rogue_ap,
+            "Deauth": self._handle_deauth,
+            "Botnet": self._handle_botnet_ddos,
+            "SQL_Injection": self._handle_sql_injection,
+            "(Re)Assoc": self._handle_reassociation
         }
         self.action_handler = ActionHandler()
 
     def log_action(self, action, details):
         """Log mitigation actions."""
-        logging.info(f"Action: {action}, Details: {details}")
+        logging.info(f"Action: {action} ; Details: {details}")
+        
 
     async def handle_threat(self, threat_type, packet):
         """Handles different types of threats"""
@@ -125,12 +125,12 @@ class Mitigator:
             return await handler(packet)
         else:
             logging.warning(f"No handler found for threat type: {threat_type}")
-            return MitigationAction.PASS
+            return [MitigationAction.PASS.value]
 
     async def _handle_rogue_ap(self, packet):
         """Handle rogue access point threats"""
         print("Mitigating rogue access point...")
-        mac_address = packet.get("mac")
+        mac_address = packet.get("wlan.sa")
         try:
             success = await self.action_handler.block(mac_address=mac_address, method="mac")
             if success:
@@ -156,12 +156,12 @@ class Mitigator:
             print(f"Failed to block rogue AP: {e}")
 
         print("Rogue AP mitigation complete.")
-        return [MitigationAction.BLOCK, MitigationAction.FLUSH_ARP]
+        return [MitigationAction.BLOCK.value, MitigationAction.FLUSH_ARP.value]
 
     async def _handle_deauth(self, packet):
         """Handle deauthentication frame attacks"""
         print("Mitigating deauth attack...")
-        interface = packet.get("interface", "wlan0mon")
+        interface = packet.get("frame.interface_name", "wlo1")
         try:
             # Check if mdk3 is available
             if shutil.which("mdk3"):
@@ -204,7 +204,7 @@ class Mitigator:
             print(f"Failed to handle deauth attack: {e}")
 
         print("Deauth attack mitigation complete.")
-        return MitigationAction.BLOCK_DEAUTH
+        return [MitigationAction.BLOCK_DEAUTH.value]
 
     async def _handle_botnet_ddos(self, packet):
         """Handle botnet and DDoS attacks"""
@@ -245,7 +245,7 @@ class Mitigator:
                 print(f"Failed to mitigate botnet/DDoS: {e}")
 
         print("Botnet/DDoS mitigation complete.")
-        return [MitigationAction.RATE_LIMIT, MitigationAction.BLOCK_IP, MitigationAction.PROTECT_SYN]
+        return [MitigationAction.RATE_LIMIT.value, MitigationAction.BLOCK_IP.value, MitigationAction.PROTECT_SYN.value]
 
     async def _handle_sql_injection(self, packet):
         """Handle SQL injection attacks"""
@@ -260,7 +260,7 @@ class Mitigator:
                 self.log_action("simulated_sql_injection_patch", {
                                 "webapp_dir": webapp_dir})
                 print(f"Simulated applying SQL injection protection to web applications")
-                return MitigationAction.PATCH
+                return [MitigationAction.PATCH_SQL.value]
 
             # Look for PHP files and add basic SQL injection protection
             found_files = False
@@ -310,13 +310,13 @@ class Mitigator:
             print(f"Failed to patch SQL injection: {e}")
 
         print("SQL injection mitigation complete.")
-        return [MitigationAction.PATCH_SQL]
+        return [MitigationAction.PATCH_SQL.value]
 
     async def _handle_reassociation(self, packet):
         """Handle reassociation attacks"""
         print("Mitigating reassociation attack...")
-        interface = packet.get("interface", "wlan0")
-        mac_address = packet.get("mac")
+        interface = packet.get("frame.interface_name", "wlo1")
+        mac_address = packet.get("wlan.sa")
 
         try:
             # Check if hostapd config exists
@@ -378,7 +378,7 @@ class Mitigator:
             print(f"Failed to handle reassociation attack: {e}")
 
         print("Reassociation attack mitigation complete.")
-        return [MitigationAction.DISABLE_AUTH, MitigationAction.HOSTAPD_CONFIG_PROTECTION]
+        return [MitigationAction.DISABLE_AUTH.value, MitigationAction.HOSTAPD_CONFIG_PROTECTION.value]
 
     def reset_mitigations(self):
         """Clears all mitigation rules (for cleanup)"""
@@ -435,29 +435,3 @@ class Mitigator:
             print("All mitigation rules have been cleared.")
         except Exception as e:
             print(f"Failed to reset mitigations: {e}")
-
-
-# Example Usage
-
-async def main():
-    mitigator = Mitigator()
-
-    # Example threats and their details
-    threats = [
-        {"type": "deauth", "packet": {"interface": "wlan0mon"}},
-        {"type": "botnet_ddos", "packet": {"ip": "192.168.1.100", "rate": "512kbit"}},
-        {"type": "rogue_ap", "packet": {"mac": "00:11:22:33:44:55"}},
-        {"type": "sql_injection", "packet": {}},
-        {"type": "reassociation", "packet": {"interface": "wlan0"}}
-    ]
-
-    for threat in threats:
-        print(f"\nHandling threat: {threat['type']}")
-        actions = await mitigator.handle_threat(threat['type'], threat['packet'])
-        print(f"Action taken: {actions}")
-        
-    # Clean up at the end
-    mitigator.reset_mitigations()
-
-""" if __name__ == "__main__":
-    asyncio.run(main()) """

@@ -1,22 +1,40 @@
-from scapy.all import sniff, AsyncSniffer
-import asyncio
+# sniffer.py
+import subprocess
+import csv
 
-class PacketSniffer:
-    def __init__(self, interface="eth0"):
-        self.interface = interface
-        self.async_sniffer = AsyncSniffer(iface=self.interface)
 
-    async def capture_packet(self):
-        """Captures network packets asynchronously"""
-        return await self.async_sniffer.next()
+def capture_packets(interface="wlo1", output_file="captured_packets.csv"):
+    fields = [
+        'frame.len', 'frame.time_delta', 'frame.time_delta_displayed', 'frame.time_epoch',
+        'frame.time_relative', 'radiotap.length', 'radiotap.timestamp.ts', 'wlan.duration',
+        'wlan.fc.frag', 'wlan.fc.order', 'wlan.fc.moredata', 'wlan.fc.protected',
+        'wlan.fc.pwrmgt', 'wlan.fc.type', 'wlan.fc.retry', 'wlan.fc.subtype',
+        'wlan_radio.duration', 'wlan.seq', 'wlan_radio.data_rate', 'wlan_radio.signal_dbm',
+        'wlan_radio.phy', 'wlan.sa', 'wlan.da', 'wlan.bssid',
+        'frame.interface_name'
+    ]
 
-    def process_packet(self, packet):
-        """Extracts relevant features from packet"""
-        features = {
-            'src_ip': packet.src,
-            'dst_ip': packet.dst,
-            'protocol': packet.proto,
-            'length': len(packet),
-            'timestamp': packet.time
-        }
-        return features
+    cmd = [
+        "tshark", "-i", interface, "-I", "-Y", "wlan", "-T", "fields"
+    ]
+
+    for field in fields:
+        cmd += ["-e", field]
+
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    print("Starting packet capture...")
+    try:
+        with open(output_file, mode="w", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=fields)
+            writer.writeheader()
+
+            for line in iter(process.stdout.readline, ''):
+                values = line.strip().split('\t')
+                packet_data = dict(zip(fields, values))
+                writer.writerow(packet_data)
+
+    except KeyboardInterrupt:
+        print("Stopping packet capture.")
+        process.terminate()
