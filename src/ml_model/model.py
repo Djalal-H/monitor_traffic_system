@@ -71,6 +71,7 @@ def make_predictions(input_csv="captured_packets.csv", model_path='./rf_attacks.
     # Save predictions and probabilities to a CSV file
     X_ready['predictions'] = rf_model.predict(X_ready)
     X_ready['confidence'] = y_pred_proba.max(axis=1)  # Maximum probability as confidence
+    X_ready['wlan.sa'] = raw['wlan.sa']
     X_ready.to_csv(output_csv, index=False)
     print(f"Predictions with confidence saved to {output_csv}")
 

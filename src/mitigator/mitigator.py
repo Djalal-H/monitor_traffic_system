@@ -61,7 +61,7 @@ class ActionHandler:
             return True
 
     @staticmethod
-    async def rate_limit(ip_address, rate="1mbit", interface="wlan0"):
+    async def rate_limit(ip_address, rate="1mbit", interface="wlo1"):
         """Rate-limit traffic from a specific IP address"""
         try:
             # Check if tc is available
@@ -397,7 +397,7 @@ class Mitigator:
 
             # Reset traffic control rules if tc exists
             if shutil.which("tc"):
-                interfaces = ["wlan0", "eth0"]  # Add common interfaces
+                interfaces = ["wlo1", "eth0"]  # Add common interfaces
                 for interface in interfaces:
                     try:
                         subprocess.run(["tc", "qdisc", "del", "dev", interface, "root"],
@@ -421,7 +421,7 @@ class Mitigator:
 
             # Re-enable APs if hostapd_cli exists
             if shutil.which("hostapd_cli"):
-                for interface in ["wlan0", "wlan1"]:
+                for interface in ["wlo1", "wlan1"]:
                     try:
                         subprocess.run(["hostapd_cli", "-i", interface, "enable"],
                                        check=False)

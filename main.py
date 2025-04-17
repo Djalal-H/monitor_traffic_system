@@ -28,10 +28,12 @@ async def run_pipeline():
         threat_type = prediction['predictions']
 
         if threat_type == 'Normal':
-            packet_details = prediction.to_dict()
             print("No threat detected.")
-            print(retrieve_ip(packet_details['wlan.sa']))
+
             continue
+
+        packet_details = prediction.to_dict()
+        packet_details['ip'] = retrieve_ip(packet_details['wlan.sa'])
         # Convert the row into a dictionary for the packet data
         # Handle the threat based on the prediction
         actions = await mitigator_instance.handle_threat(threat_type, packet_details)

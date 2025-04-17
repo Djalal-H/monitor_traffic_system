@@ -11,7 +11,7 @@ def capture_packets(interface="wlo1", output_file="captured_packets.csv"):
         'wlan.fc.pwrmgt', 'wlan.fc.type', 'wlan.fc.retry', 'wlan.fc.subtype',
         'wlan_radio.duration', 'wlan.seq', 'wlan_radio.data_rate', 'wlan_radio.signal_dbm',
         'wlan_radio.phy', 'wlan.sa', 'wlan.da', 'wlan.bssid',
-        'frame.interface_name'
+        'frame.interface_name',
     ]
 
     cmd = [
@@ -38,3 +38,6 @@ def capture_packets(interface="wlo1", output_file="captured_packets.csv"):
     except KeyboardInterrupt:
         print("Stopping packet capture.")
         process.terminate()
+
+if __name__ == "__main__":
+    capture_packets()

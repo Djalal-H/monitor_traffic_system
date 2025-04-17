@@ -15,8 +15,8 @@ def insert_threat(threat_type, packet, confidence, actions):
     try:
         threats_collection.insert_one({
             "type": threat_type,
-            "IP source": packet['ip'],
-            "MAC source": packet['wlan.sa'],
+            "IP_source": packet['ip'],
+            "MAC_source": packet['wlan.sa'],
             "confidence": confidence,
             "timestamp": datetime.now(),
             "actions": actions,
