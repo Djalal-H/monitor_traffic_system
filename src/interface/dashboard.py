@@ -45,7 +45,7 @@ while True:
             df_threats = pd.DataFrame(raw_threats)
 
             # ✅ Show only selected columns, including the 'actions' column
-            display_columns = ["type", "source",
+            display_columns = ["type", "IP_source", "MAC_source",
                                "confidence", "timestamp", "actions"]
             st.dataframe(df_threats[display_columns],
                          use_container_width=True, hide_index=True)
