@@ -410,3 +410,19 @@ WARNING:root:No handler found for threat type: Normal
 WARNING:root:No handler found for threat type: Normal
 WARNING:root:No handler found for threat type: Normal
 WARNING:root:No handler found for threat type: Normal
+WARNING:root:No handler found for threat type: Evil_Twin
+INFO:root:Action: simulated_sql_injection_patch ; Details: {'webapp_dir': '/var/www/html'}
+WARNING:root:No handler found for threat type: RogueAP
+WARNING:root:No handler found for threat type: Malware
+WARNING:root:No handler found for threat type: Evil_Twin
+WARNING:root:No handler found for threat type: Kr00k
+WARNING:root:No handler found for threat type: Malware
+WARNING:root:No handler found for threat type: Kr00k
+WARNING:root:No handler found for threat type: Krack
+WARNING:root:No handler found for threat type: Malware
+WARNING:root:No handler found for threat type: Krack
+INFO:root:Action: simulated_sql_injection_patch ; Details: {'webapp_dir': '/var/www/html'}
+WARNING:root:No handler found for threat type: Malware
+INFO:root:Action: simulated_sql_injection_patch ; Details: {'webapp_dir': '/var/www/html'}
+INFO:root:Action: simulated_sql_injection_patch ; Details: {'webapp_dir': '/var/www/html'}
+INFO:root:Action: simulated_sql_injection_patch ; Details: {'webapp_dir': '/var/www/html'}
